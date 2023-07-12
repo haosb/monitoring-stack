@@ -1,0 +1,24 @@
+{{ define "telegram.message" }}
+{{if eq .Status "firing"}}
+Status: <b>{{.Status | toUpper}} 🔥</b>
+{{end -}}
+{{if eq .Status "resolved"}}
+Status: <b>{{.Status | toUpper}} ✅</b>
+{{end }}
+{{ range .Alerts }}
+Alert: {{ .Labels.alertname }}
+Description: {{ .Annotations.description | reReplaceAll "&" "&amp;" | reReplaceAll "<" "&lt;" | reReplaceAll ">" "&gt;" }}
+Details:
+  {{ range .Labels.SortedPairs }} - {{ .Name }}: {{ .Value }}
+  {{ end }}
+Graph: {{ .GeneratorURL }}
+{{$severity := .Labels.severity -}}
+{{if eq $severity "warning" -}}
+Severity: {{$severity}} ⚠️
+{{else if eq $severity "critical" -}}
+Severity: {{$severity}} 🚨
+{{else -}}
+Severity: {{$severity}}
+{{- end -}}
+{{ end }}
+{{ end }}

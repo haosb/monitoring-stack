@@ -1,0 +1,16 @@
+route:
+  receiver: telegram
+  group_by: ['alertname']
+  group_wait: 10s
+  repeat_interval: 30m
+
+receivers:
+  - name: telegram
+    telegram_configs:
+    - bot_token: your_token
+      api_url: https://api.telegram.org
+      chat_id: your_chatid
+      message: '{{ template "telegram.message" . }}'
+      parse_mode: HTML
+templates:
+- /etc/alertmanager/*.tmpl

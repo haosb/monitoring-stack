@@ -1,0 +1,24 @@
+groups:
+- name: Monitoring
+  rules:
+
+  - alert: HostOutOfMemory
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+    for: 1m
+    annotations: 
+      summary: Заканчивается ОЗУ на (instance {{ $labels.instance }})
+      description: "ОЗУ осталось (< 10%) (текущее значение: {{ $value }}%)"
+  
+  - alert: NodeDown
+    expr: up{job="shops-vm-metrics"} == 0
+    for: 1m
+    annotations:
+      summary: ВМ {{ $labels.instance }} не отвечает
+      description: "ВМ {{ $labels.instance }} не отвечает 2 минуты. Похоже отключилась."
+  
+  - alert: NodeHighCpu
+    expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    annotations:
+      summary: Высокая нагрузка на {{ $labels.instance }}
+      description: "ВМ {{ $labels.instance }} загружена на (value: {{ $value }}%)"
